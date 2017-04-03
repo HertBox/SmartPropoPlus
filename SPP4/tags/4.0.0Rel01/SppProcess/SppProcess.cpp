@@ -1208,7 +1208,7 @@ inline UINT CSppProcess::NormalizePulse(UINT Length)
  void  CSppProcess::ProcessPulsePpm(int width, BOOL input)
 {
     static int sync = 0;
-
+    static int last_separator_width = 0;
     int newdata;				/* Current width in joystick values */
     static int data[14];		/* Array of pulse widthes in joystick values */
     static int datacount = 0;	/* pulse index (corresponds to channel index) */
@@ -1229,6 +1229,7 @@ inline UINT CSppProcess::NormalizePulse(UINT Length)
 	{
 		prev_sep = true;
 		former_sync = 0;
+		last_separator_width = width;
 		return;
 	};
 
@@ -1283,7 +1284,9 @@ inline UINT CSppProcess::NormalizePulse(UINT Length)
 	if (input|| m_JsChPostProc_selected!=-1)
 		newdata = (int)(1024 - (width - PPM_MIN) / (PPM_MAX - PPM_MIN) * 1024); /* JR */
 	else
-		newdata = (int)((width - PPM_MIN) / (PPM_MAX - PPM_MIN) * 1024);		/* Futaba */
+		
+		//newdata = (int)((width - PPM_MIN) / (PPM_MAX - PPM_MIN) * 1024);		/* Futaba */
+		newdata = (int)((width + last_separator_width - 192.0) / (192.0) * 1024);
 
 	/* Trim values into 0-1023 boundries */
     if (newdata < 0) newdata = 0;
